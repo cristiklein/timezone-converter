@@ -57,13 +57,6 @@ function useQueryState<T>(key: string, initial: T, encode: (v: T) => string, dec
 
 const fmtTime = (dt: DateTime, use12h: boolean) => dt.toFormat(use12h ? "hh:mm a" : "HH:mm");
 
-const parseISOish = (s: string) => {
-  // Accepts "YYYY-MM-DDTHH:mm" from <input type="datetime-local">
-  // Returns Luxon DateTime in the browser's zone (plain wall time)
-  const dt = DateTime.fromISO(s);
-  return dt.isValid ? dt : DateTime.local();
-};
-
 function useLiveUTC() {
   const [nowUTC, setNowUTC] = useState(DateTime.utc());
 
@@ -141,12 +134,13 @@ export default function TimeZ() {
             <button onClick={copyLink} className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm shadow">
               Copy link
             </button>
-            <label className="inline-flex items-center gap-2 text-sm">
-              <input type="checkbox" className="h-4 w-4" checked={use12h} onChange={(e) => setUse12h(e.target.checked)} />
-              12‑hour clock
-            </label>
           </div>
         </header>
+
+        <section>
+          <h2 className="text-base font-semibold mb-2">Current Time</h2>
+          <TimezoneTable now={nowUTC} zones={zones} />
+        </section>
 
         <section className="mt-6 grid md:grid-cols-[1fr_320px] gap-6">
           <aside className="bg-slate-900 rounded-2xl p-4 shadow space-y-4">
@@ -196,11 +190,6 @@ export default function TimeZ() {
             </table>
           </div>
 
-        </section>
-
-        <section>
-          <h2 className="text-base font-semibold mb-2">Current Time</h2>
-          <TimezoneTable now={nowUTC} zones={zones} />
         </section>
 
         <footer className="mt-8 text-xs text-slate-500">

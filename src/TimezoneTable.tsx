@@ -15,30 +15,53 @@ export default function TimezoneTable({
     baseStart.plus({ hour })
   );
 
+  const currentHour = now.setZone(baseZone).hour;
+
   return (
-    <table className="w-full text-sm text-slate-200">
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        fontFamily: "monospace",
+        fontSize: "14px",
+      }}
+    >
       <thead>
         <tr>
           {zones.map((zone) => (
-            <th key={zone} className="px-3 py-2 text-left text-slate-400">
+            <th key={zone} style={{ padding: "4px 8px", textAlign: "left" }}>
               {zone}
             </th>
           ))}
         </tr>
       </thead>
       <tbody>
-        {hours.map((hour, i) => (
-          <tr key={i} className="border-t border-slate-800">
-            {zones.map((zone) => {
-              const local = hour.setZone(zone, { keepLocalTime: false });
-              return (
-                <td key={zone} className="px-3 py-2 font-mono text-slate-100">
-                  {local.toFormat("HH:mm")}
-                </td>
-              );
-            })}
-          </tr>
-        ))}
+        {hours.map((hour, i) => {
+          const isCurrent = i === currentHour;
+          const isNight = i >= 22 || i < 6;
+          return (
+            <tr key={i}
+              style={{
+                borderTop: "1px solid #444",
+                backgroundColor: isCurrent
+                  ? "#003300"
+                  : isNight
+                  ? "#000"
+                  : "transparent",
+                color: isNight ? "#aaa" : "#eee",
+              }}
+            >
+              {zones.map((zone) => {
+                const local = hour.setZone(zone, { keepLocalTime: false });
+                return (
+                  <td key={zone} className="px-3 py-2 font-mono text-slate-100">
+                    {local.toFormat("HH:mm")}
+                  </td>
+                );
+              })}
+            </tr>
+          )})
+        }
       </tbody>
     </table>
   );
