@@ -1,73 +1,63 @@
-# React + TypeScript + Vite
+# 🌍 Time Zone Converter (TimeZ)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fast, minimalist web app to compare times across multiple time zones — built with **React**, **Vite**, and **Luxon**, deployed on **GitHub Pages**, and installable as a **Progressive Web App (PWA)**.
 
-Currently, two official plugins are available:
+![screenshot](./public/screenshot.svg)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+- 🕒 **Instant conversion** between time zones  
+- 🧩 **Table view** with hours as rows and time zones as columns  
+- 🔴 **Red** highlights the current time  
+- 🌙 **Night hours** (22:00–06:00) visually dimmed  
+- 📱 **Mobile-friendly**: native `<select>` on mobile, `<datalist>` search on desktop  
+- 🔗 **Shareable URLs**: state synced to the query string  
+- 📱 **Progressive Web App** can be installed on Android
+- ⚡ **Offline support** via service worker (PWA)  
+- 🧭 **Privacy-first**: all time calculations and conversions happen entirely in your browser.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🧱 Tech Stack
 
-## Expanding the ESLint configuration
+| Purpose | Library / Tool |
+|----------|----------------|
+| Framework | [React](https://react.dev/) |
+| Build tool | [Vite](https://vitejs.dev/) |
+| Date handling | [Luxon](https://moment.github.io/luxon/#/) |
+| Deployment | [GitHub Pages](https://pages.github.com/) |
+| PWA | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Local Development
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# 1. Clone the repository
+git clone https://github.com/<your-username>/timezone-converter.git
+cd timezone-converter
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# 2. Install dependencies
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 3. Start local dev server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at http://localhost:5173.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🧩 Build & Deploy
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+To build for production and preview locally:
+
 ```
+npm run build
+npm run preview
+```
+
+Manual deploy to GitHub Pages:
+
+```
+npm run deploy
+```
+
+### 📜 License
+
+Released under the [MIT License](./LICENSE).
+Feel free to fork, remix, and improve.

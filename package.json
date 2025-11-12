@@ -1,7 +1,9 @@
 {
   "name": "timezone-converter",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Cristian Klein <cristiklein@gmail.com>",
   "type": "module",
   "homepage": "https://cristiklein.github.io/timezone-converter/",
   "scripts": {
