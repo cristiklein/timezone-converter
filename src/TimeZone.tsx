@@ -16,6 +16,7 @@ import TimezoneTable from "./TimezoneTable";
 const DEFAULT_ZONES = [
   "Europe/Stockholm",
   "America/Phoenix",
+  "Europe/Bucharest",
 ];
 
 const safeSupportedTimeZones = (): string[] => {
