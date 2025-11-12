@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useMemo, useState } from "react";
 import { DateTime, IANAZone } from "luxon";
+import TimezoneTable from "./TimezoneTable";
 
 /**
  * TimeZ — single-file React timezone converter
@@ -194,6 +195,11 @@ export default function TimeZ() {
             </table>
           </div>
 
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold mb-2">Current Time</h2>
+          <TimezoneTable now={nowUTC} zones={zones} />
         </section>
 
         <footer className="mt-8 text-xs text-slate-500">
