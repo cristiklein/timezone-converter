@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { shortZone } from "./utils";
 
 export default function TimezoneTable({
   now,
@@ -30,7 +31,7 @@ export default function TimezoneTable({
         <tr>
           {zones.map((zone) => (
             <th key={zone} style={{ padding: "4px 8px", textAlign: "left" }}>
-              {zone}
+              {shortZone(zone)}
             </th>
           ))}
         </tr>

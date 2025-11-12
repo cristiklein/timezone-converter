@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DateTime, IANAZone } from "luxon";
 import ZoneSelect from "./ZoneSelect";
 import TimezoneTable from "./TimezoneTable";
+import { shortZone } from './utils';
 
 /**
  * TimeZ — single-file React timezone converter
@@ -174,7 +175,7 @@ export default function TimeZ() {
                   borderTop: "1px solid #444",
                 }}>
                   <td>
-                    <div>{zone}</div>
+                    <div>{shortZone(zone)}</div>
                   </td>
                   <td style={{ padding: "0px 10px" }}>
                     <div>{fmtTime(dt, use12h)}</div>
