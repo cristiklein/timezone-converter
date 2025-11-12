@@ -44,16 +44,28 @@ const safeSupportedTimeZones = (): string[] => {
   return list.filter((z) => IANAZone.isValidZone(z));
 };
 
-function useQueryState<T>(key: string, initial: T, encode: (v: T) => string, decode: (s: string | null) => T) {
-  const [state, setState] = useState<T>(() => decode(new URLSearchParams(location.search).get(key)));
+function useQueryState<T>(
+  key: string,
+  encode: (v: T) => string,
+  decode: (s: string | null) => T
+) {
+  const [state, setState] = useState<T>(() => {
+    const raw = new URLSearchParams(location.search).get(key);
+    return decode(raw);
+  });
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const v = encode(state);
-    if (v) params.set(key, v); else params.delete(key);
+    if (v)
+      params.set(key, v);
+    else
+      params.delete(key);
+
     const qs = params.toString();
     const url = qs ? `${location.pathname}?${qs}` : location.pathname;
     window.history.replaceState(null, "", url);
-  }, [key, state]);
+  }, [key, state, encode, decode]);
   return [state, setState] as const;
 }
 
@@ -76,14 +88,12 @@ export default function TimeZ() {
   // --- URL-backed state ---
   const [use12h] = useQueryState<boolean>(
     "h12",
-    false,
     (v) => (v ? "1" : ""),
     (s) => s === "1"
   );
 
   const [zones, setZones] = useQueryState<string[]>(
     "zones",
-    DEFAULT_ZONES,
     (arr) => arr.join(","),
     (s) => {
       const parsed = (s?.split(",") || DEFAULT_ZONES).filter((z) => IANAZone.isValidZone(z));
