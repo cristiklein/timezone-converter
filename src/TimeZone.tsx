@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { DateTime, IANAZone } from "luxon";
 import TimezoneTable from "./TimezoneTable";
 
@@ -72,7 +72,7 @@ export default function TimeZ() {
   const allZones = useMemo(() => safeSupportedTimeZones(), []);
 
   // --- URL-backed state ---
-  const [use12h, setUse12h] = useQueryState<boolean>(
+  const [use12h] = useQueryState<boolean>(
     "h12",
     false,
     (v) => (v ? "1" : ""),
