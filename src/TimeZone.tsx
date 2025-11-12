@@ -13,11 +13,8 @@ import { DateTime, IANAZone } from "luxon";
  */
 
 const DEFAULT_ZONES = [
-  Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Stockholm",
-  "UTC",
-  "America/New_York",
-  "Europe/London",
-  "Asia/Tokyo",
+  "Europe/Stockholm",
+  "America/Phoenix",
 ];
 
 const safeSupportedTimeZones = (): string[] => {
