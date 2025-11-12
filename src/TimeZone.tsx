@@ -1,5 +1,6 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DateTime, IANAZone } from "luxon";
+import ZoneSelect from "./ZoneSelect";
 import TimezoneTable from "./TimezoneTable";
 
 /**
@@ -197,49 +198,6 @@ export default function TimeZ() {
       <footer>
         Built with <a href="https://moment.github.io/luxon/" target="_blank" rel="noreferrer">Luxon</a> & Intl API. No tracking.
       </footer>
-    </div>
-  );
-}
-
-function ZoneSelect({ value, onChange, zones, placeholder }: { value: string; onChange: (z: string) => void; zones: string[]; placeholder?: string; }) {
-  const [query, setQuery] = useState("");
-  const id = useId(); // unique per component instance
-  const inputId = `${id}-add-timezone`;
-  const options = useMemo(() =>
-    zones
-      .filter((z) => z.toLowerCase().includes(query.toLowerCase()))
-      .slice(0, 200), [zones, query]
-  );
-
-  return (
-    <div>
-      <label
-        htmlFor={inputId}
-       >
-        Add Timezone:
-      </label>
-      <input
-        id={inputId}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder={placeholder || "Search…"}
-
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            const first = options[0];
-            if (first) {
-              onChange(first);
-              setQuery("");
-            }
-          }
-        }}
-        list="tz-datalist"
-      />
-      <datalist id="tz-datalist">
-        {options.map((z) => (
-          <option key={z} value={z} />
-        ))}
-      </datalist>
     </div>
   );
 }
