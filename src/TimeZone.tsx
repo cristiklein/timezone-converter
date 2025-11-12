@@ -128,70 +128,75 @@ export default function TimeZ() {
     <div style={{
       padding: '5px',
     }}>
-      <div>
-        <header>
-          <h1 style={{
-            fontSize: '24px',
-          }}>Timezone Converter</h1>
-        </header>
+      <header>
+        <h1 style={{
+          fontSize: '24px',
+        }}>Timezone Converter</h1>
+      </header>
 
-        <section>
-          <TimezoneTable now={nowUTC} zones={zones} />
-          <button onClick={copyLink}>
-            Copy link to clipboard
-          </button>
-        </section>
+      <section>
+        <TimezoneTable now={nowUTC} zones={zones} />
+        <button onClick={copyLink}>
+          Copy link to clipboard
+        </button>
+      </section>
 
-        <section>
-          <h2>Configure timezones</h2>
-          <ZoneSelect
-            value=""
-            onChange={(z) => z && addZone(z)}
-            zones={allZones.filter((z) => !zones.includes(z))}
-            placeholder="Search…"
-          />
+      <section>
+        <h2>Configure timezones</h2>
+        <ZoneSelect
+          value=""
+          onChange={(z) => z && addZone(z)}
+          zones={allZones.filter((z) => !zones.includes(z))}
+          placeholder="Search…"
+        />
 
-          <div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Timezone</th>
-                  <th>Local time</th>
-                  <th>Offset</th>
-                  <th>Actions</th>
+        <div>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontFamily: "monospace",
+              fontSize: "14px",
+            }}
+          >
+            <thead>
+              <tr>
+                <th>Timezone</th>
+                <th>Local time</th>
+                <th>Offset</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {conversions.map(({ zone, dt, dayDelta }) => (
+                <tr key={zone} style={{
+                  borderTop: "1px solid #444",
+                }}>
+                  <td>
+                    <div>{zone}</div>
+                  </td>
+                  <td style={{ padding: "0px 10px" }}>
+                    <div>{fmtTime(dt, use12h)}</div>
+                    <div>{dt.toFormat("ccc, dd LLL yyyy")}{dayDelta === 0 ? "" : dayDelta > 0 ? "  (+1 day)" : "  (−1 day)"}</div>
+                  </td>
+                  <td style={{ padding: "0px 10px" }}>UTC{dt.toFormat("ZZ")}</td>
+                  <td>
+                    <div>
+                      <button title="Move up" onClick={() => moveZone(zone, -1)}>↑</button>
+                      <button title="Move down" onClick={() => moveZone(zone, 1)}>↓</button>
+                       <button title="Remove" onClick={() => removeZone(zone)}>✕</button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {conversions.map(({ zone, dt, dayDelta }) => (
-                  <tr key={zone}>
-                    <td>
-                      <div>{zone}</div>
-                      <div>{dt.offsetNameShort || dt.toFormat("ZZ")}</div>
-                    </td>
-                    <td>
-                      <div>{fmtTime(dt, use12h)}</div>
-                      <div>{dt.toFormat("ccc, dd LLL yyyy")}{dayDelta === 0 ? "" : dayDelta > 0 ? "  (+1 day)" : "  (−1 day)"}</div>
-                    </td>
-                    <td>UTC{dt.toFormat("ZZ")}</td>
-                    <td>
-                      <div>
-                        <button title="Move up" onClick={() => moveZone(zone, -1)}>↑</button>
-                        <button title="Move down" onClick={() => moveZone(zone, 1)}>↓</button>
-                         <button title="Remove" onClick={() => removeZone(zone)}>✕</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-        </section>
-
-        <footer>
-          Built with <a href="https://moment.github.io/luxon/" target="_blank" rel="noreferrer">Luxon</a> & Intl API. No tracking.
-        </footer>
-      </div>
+      <footer>
+        Built with <a href="https://moment.github.io/luxon/" target="_blank" rel="noreferrer">Luxon</a> & Intl API. No tracking.
+      </footer>
     </div>
   );
 }
