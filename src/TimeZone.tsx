@@ -125,63 +125,59 @@ export default function TimeZ() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto">
-        <header className="mb-6 flex items-start md:items-center flex-col md:flex-row gap-3">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Timezone Converter</h1>
-          <div className="flex-1" />
-          <div className="flex items-center gap-3">
-            <button onClick={copyLink} className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm shadow">
-              Copy link
-            </button>
-          </div>
+    <div style={{
+      padding: '5px',
+    }}>
+      <div>
+        <header>
+          <h1 style={{
+            fontSize: '24px',
+          }}>Timezone Converter</h1>
         </header>
 
         <section>
-          <h2 className="text-base font-semibold mb-2">Current Time</h2>
           <TimezoneTable now={nowUTC} zones={zones} />
+          <button onClick={copyLink}>
+            Copy link to clipboard
+          </button>
         </section>
 
-        <section className="mt-6 grid md:grid-cols-[1fr_320px] gap-6">
-          <aside className="bg-slate-900 rounded-2xl p-4 shadow space-y-4">
-            <div>
-              <h2 className="text-base font-semibold mb-2">Configure timezones</h2>
-              <ZoneSelect
-                value=""
-                onChange={(z) => z && addZone(z)}
-                zones={allZones.filter((z) => !zones.includes(z))}
-                placeholder="Search…"
-              />
-            </div>
-          </aside>
+        <section>
+          <h2>Configure timezones</h2>
+          <ZoneSelect
+            value=""
+            onChange={(z) => z && addZone(z)}
+            zones={allZones.filter((z) => !zones.includes(z))}
+            placeholder="Search…"
+          />
 
-          <div className="bg-slate-900 rounded-2xl p-4 shadow overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-slate-400">
-                <tr className="border-b border-slate-800">
-                  <th className="text-left font-medium py-2">Timezone</th>
-                  <th className="text-left font-medium py-2">Local time</th>
-                  <th className="text-left font-medium py-2">Offset</th>
-                  <th className="text-left font-medium py-2">Actions</th>
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Timezone</th>
+                  <th>Local time</th>
+                  <th>Offset</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {conversions.map(({ zone, dt, dayDelta }) => (
-                  <tr key={zone} className="border-b border-slate-800">
-                    <td className="py-2 align-middle">
-                      <div className="font-medium">{zone}</div>
-                      <div className="text-xs text-slate-400">{dt.offsetNameShort || dt.toFormat("ZZ")}</div>
+                  <tr key={zone}>
+                    <td>
+                      <div>{zone}</div>
+                      <div>{dt.offsetNameShort || dt.toFormat("ZZ")}</div>
                     </td>
-                    <td className="py-2 align-middle">
-                      <div className="font-mono text-base">{fmtTime(dt, use12h)}</div>
-                      <div className="text-xs text-slate-400">{dt.toFormat("ccc, dd LLL yyyy")}{dayDelta === 0 ? "" : dayDelta > 0 ? "  (+1 day)" : "  (−1 day)"}</div>
+                    <td>
+                      <div>{fmtTime(dt, use12h)}</div>
+                      <div>{dt.toFormat("ccc, dd LLL yyyy")}{dayDelta === 0 ? "" : dayDelta > 0 ? "  (+1 day)" : "  (−1 day)"}</div>
                     </td>
-                    <td className="py-2 align-middle">UTC{dt.toFormat("ZZ")}</td>
-                    <td className="py-2 align-middle">
-                      <div className="flex items-center gap-1">
-                        <button title="Move up" onClick={() => moveZone(zone, -1)} className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700">↑</button>
-                        <button title="Move down" onClick={() => moveZone(zone, 1)} className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700">↓</button>
-                         <button title="Remove" onClick={() => removeZone(zone)} className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-red-700/70">✕</button>
+                    <td>UTC{dt.toFormat("ZZ")}</td>
+                    <td>
+                      <div>
+                        <button title="Move up" onClick={() => moveZone(zone, -1)}>↑</button>
+                        <button title="Move down" onClick={() => moveZone(zone, 1)}>↓</button>
+                         <button title="Remove" onClick={() => removeZone(zone)}>✕</button>
                       </div>
                     </td>
                   </tr>
@@ -192,8 +188,8 @@ export default function TimeZ() {
 
         </section>
 
-        <footer className="mt-8 text-xs text-slate-500">
-          Built with <a className="underline" href="https://moment.github.io/luxon/" target="_blank" rel="noreferrer">Luxon</a> & Intl API. No tracking.
+        <footer>
+          Built with <a href="https://moment.github.io/luxon/" target="_blank" rel="noreferrer">Luxon</a> & Intl API. No tracking.
         </footer>
       </div>
     </div>
@@ -211,10 +207,10 @@ function ZoneSelect({ value, onChange, zones, placeholder }: { value: string; on
   );
 
   return (
-    <div className="relative">
+    <div>
       <label
         htmlFor={inputId}
-        className="block text-xs uppercase tracking-wide text-slate-400 mb-1">
+       >
         Add Timezone:
       </label>
       <input
@@ -222,7 +218,7 @@ function ZoneSelect({ value, onChange, zones, placeholder }: { value: string; on
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder || "Search…"}
-        className="w-full bg-slate-800 rounded-xl px-3 py-2 outline-none ring-1 ring-slate-700 focus:ring-slate-500"
+
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             const first = options[0];
