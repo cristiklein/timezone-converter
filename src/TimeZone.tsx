@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useId, useMemo, useState } from "react";
 import { DateTime, IANAZone } from "luxon";
 
 /**
@@ -62,6 +62,17 @@ const parseISOish = (s: string) => {
   return dt.isValid ? dt : DateTime.local();
 };
 
+function useLiveUTC() {
+  const [nowUTC, setNowUTC] = useState(DateTime.utc());
+
+  useEffect(() => {
+    const id = setInterval(() => setNowUTC(DateTime.utc()), 10_000);
+    return () => clearInterval(id);
+  }, []);
+
+  return nowUTC;
+}
+
 export default function TimeZ() {
   const allZones = useMemo(() => safeSupportedTimeZones(), []);
 
@@ -83,43 +94,17 @@ export default function TimeZ() {
     }
   );
 
-  const [srcZone, setSrcZone] = useQueryState<string>(
-    "src",
-    zones[0] || DEFAULT_ZONES[0],
-    (v) => v,
-    (s) => (s && IANAZone.isValidZone(s) ? s : (zones[0] || DEFAULT_ZONES[0]))
-  );
+  // --- Clock ---
+  const nowUTC = useLiveUTC();
 
-  const [rawLocal, setRawLocal] = useQueryState<string>(
-    "t",
-    DateTime.local().toFormat("yyyy-LL-dd'T'HH:mm"),
-    (v) => v,
-    (s) => s || DateTime.local().toFormat("yyyy-LL-dd'T'HH:mm")
-  );
-
-  // Derived DateTime in source zone: interpret the wall time from the input
-  // as if it were in srcZone.
-  const srcWall = useMemo(() => {
-    const parsed = parseISOish(rawLocal);
-    return DateTime.fromObject(
-      {
-        year: parsed.year,
-        month: parsed.month,
-        day: parsed.day,
-        hour: parsed.hour,
-        minute: parsed.minute,
-      },
-      { zone: srcZone }
-    );
-  }, [rawLocal, srcZone]);
-
+  // Precompute conversions for the header list
   const conversions = useMemo(() => {
     return zones.map((z) => {
-      const inZone = srcWall.setZone(z, { keepLocalTime: false });
-      const dayDelta = inZone.startOf("day").diff(srcWall.startOf("day"), "days").days;
+      const inZone = nowUTC.setZone(z, { keepLocalTime: false });
+      const dayDelta = inZone.startOf("day").diff(nowUTC.startOf("day"), "days").days;
       return { zone: z, dt: inZone, dayDelta: Math.trunc(dayDelta) };
     });
-  }, [zones, srcWall]);
+  }, [zones]);
 
   // --- Actions ---
   const addZone = (z: string) => setZones([...new Set([...zones, z])]);
@@ -144,56 +129,36 @@ export default function TimeZ() {
     }
   };
 
-  const nowInSrc = () => {
-    const now = DateTime.now().setZone(srcZone);
-    setRawLocal(now.toFormat("yyyy-LL-dd'T'HH:mm"));
-  };
-
-  // Keep srcZone present in zones for context
-  useEffect(() => {
-    if (!zones.includes(srcZone)) setZones([srcZone, ...zones]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [srcZone]);
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
         <header className="mb-6 flex items-start md:items-center flex-col md:flex-row gap-3">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">TimeZ — Timezone Converter</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Timezone Converter</h1>
           <div className="flex-1" />
           <div className="flex items-center gap-3">
+            <button onClick={copyLink} className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm shadow">
+              Copy link
+            </button>
             <label className="inline-flex items-center gap-2 text-sm">
               <input type="checkbox" className="h-4 w-4" checked={use12h} onChange={(e) => setUse12h(e.target.checked)} />
               12‑hour clock
             </label>
-            <button onClick={copyLink} className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm shadow">
-              Copy link
-            </button>
           </div>
         </header>
 
-        <section className="grid md:grid-cols-[1fr_auto] gap-4 md:gap-6 items-end bg-slate-900 rounded-2xl p-4 shadow">
-          <div className="grid sm:grid-cols-2 gap-3">
+        <section className="mt-6 grid md:grid-cols-[1fr_320px] gap-6">
+          <aside className="bg-slate-900 rounded-2xl p-4 shadow space-y-4">
             <div>
-              <label className="block text-xs uppercase tracking-wide text-slate-400 mb-1">Source zone</label>
-              <ZoneSelect value={srcZone} onChange={setSrcZone} zones={allZones} />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wide text-slate-400 mb-1">Date & time</label>
-              <input
-                type="datetime-local"
-                className="w-full bg-slate-800 rounded-xl px-3 py-2 outline-none ring-1 ring-slate-700 focus:ring-slate-500"
-                value={rawLocal}
-                onChange={(e) => setRawLocal(e.target.value)}
+              <h2 className="text-base font-semibold mb-2">Configure timezones</h2>
+              <ZoneSelect
+                value=""
+                onChange={(z) => z && addZone(z)}
+                zones={allZones.filter((z) => !zones.includes(z))}
+                placeholder="Search…"
               />
             </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={nowInSrc} className="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow">Now in source</button>
-          </div>
-        </section>
+          </aside>
 
-        <section className="mt-6 grid md:grid-cols-[1fr_320px] gap-6">
           <div className="bg-slate-900 rounded-2xl p-4 shadow overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-slate-400">
@@ -220,9 +185,7 @@ export default function TimeZ() {
                       <div className="flex items-center gap-1">
                         <button title="Move up" onClick={() => moveZone(zone, -1)} className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700">↑</button>
                         <button title="Move down" onClick={() => moveZone(zone, 1)} className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700">↓</button>
-                        {zone !== srcZone && (
-                          <button title="Remove" onClick={() => removeZone(zone)} className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-red-700/70">✕</button>
-                        )}
+                         <button title="Remove" onClick={() => removeZone(zone)} className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-red-700/70">✕</button>
                       </div>
                     </td>
                   </tr>
@@ -231,26 +194,6 @@ export default function TimeZ() {
             </table>
           </div>
 
-          <aside className="bg-slate-900 rounded-2xl p-4 shadow space-y-4">
-            <div>
-              <h2 className="text-base font-semibold mb-2">Add timezone</h2>
-              <ZoneSelect
-                value=""
-                onChange={(z) => z && addZone(z)}
-                zones={allZones.filter((z) => !zones.includes(z))}
-                placeholder="Search…"
-              />
-              <p className="text-xs text-slate-400 mt-2">Total zones: {zones.length}</p>
-            </div>
-            <div className="text-xs text-slate-400">
-              <p className="mb-2">Tips</p>
-              <ul className="list-disc ml-4 space-y-1">
-                <li><kbd className="px-1 rounded bg-slate-800">↑</kbd>/<kbd className="px-1 rounded bg-slate-800">↓</kbd> to reorder (use buttons)</li>
-                <li>Use the 12‑hour toggle for AM/PM format</li>
-                <li>Click <em>Copy link</em> to share your exact view</li>
-              </ul>
-            </div>
-          </aside>
         </section>
 
         <footer className="mt-8 text-xs text-slate-500">
@@ -263,6 +206,8 @@ export default function TimeZ() {
 
 function ZoneSelect({ value, onChange, zones, placeholder }: { value: string; onChange: (z: string) => void; zones: string[]; placeholder?: string; }) {
   const [query, setQuery] = useState("");
+  const id = useId(); // unique per component instance
+  const inputId = `${id}-add-timezone`;
   const options = useMemo(() =>
     zones
       .filter((z) => z.toLowerCase().includes(query.toLowerCase()))
@@ -271,7 +216,13 @@ function ZoneSelect({ value, onChange, zones, placeholder }: { value: string; on
 
   return (
     <div className="relative">
+      <label
+        htmlFor={inputId}
+        className="block text-xs uppercase tracking-wide text-slate-400 mb-1">
+        Add Timezone:
+      </label>
       <input
+        id={inputId}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder || "Search…"}
@@ -292,21 +243,6 @@ function ZoneSelect({ value, onChange, zones, placeholder }: { value: string; on
           <option key={z} value={z} />
         ))}
       </datalist>
-      <div className="mt-2">
-        <select
-          value={value}
-          onChange={(e) => {
-            onChange(e.target.value);
-            setQuery("");
-          }}
-          className="w-full bg-slate-800 rounded-xl px-3 py-2 outline-none ring-1 ring-slate-700 focus:ring-slate-500"
-        >
-          {options.length === 0 && <option value="" disabled>No matches</option>}
-          {options.map((z) => (
-            <option key={z} value={z}>{z}</option>
-          ))}
-        </select>
-      </div>
     </div>
   );
 }
