@@ -54,7 +54,7 @@ export default function TimezoneTable({
               {zones.map((zone) => {
                 const local = hour.setZone(zone, { keepLocalTime: false });
                 return (
-                  <td key={zone} className="px-3 py-2 font-mono text-slate-100">
+                  <td key={zone}>
                     {local.toFormat("HH:mm")}
                   </td>
                 );
