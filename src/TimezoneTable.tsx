@@ -38,24 +38,25 @@ export default function TimezoneTable({
       </thead>
       <tbody>
         {hours.map((hour, i) => {
-          const isCurrent = i === currentHour;
-          const isNight = i >= 22 || i < 6;
           return (
-            <tr key={i}
-              style={{
-                borderTop: "1px solid #444",
-                backgroundColor: isCurrent
-                  ? "#003300"
-                  : isNight
-                  ? "#000"
-                  : "transparent",
-                color: isNight ? "#aaa" : "#eee",
-              }}
-            >
+            <tr key={i}>
               {zones.map((zone) => {
                 const local = hour.setZone(zone, { keepLocalTime: false });
+                const isCurrent = i === currentHour;
+                const isNight = local.hour >= 22 || local.hour < 6;
                 return (
-                  <td key={zone}>
+                  <td
+                    key={zone}
+                    style={{
+                      borderTop: "1px solid #444",
+                      backgroundColor: isCurrent
+                        ? "#003300"
+                        : isNight
+                        ? "#000"
+                        : "transparent",
+                      color: isNight ? "#aaa" : "#eee",
+                    }}
+                  >
                     {local.toFormat("HH:mm")}
                   </td>
                 );
